@@ -1,0 +1,8 @@
+# Create environment python -m venv .venv --system-site-packages 
+Activate:
+(Linux/Mac) source .venv/bin/activate # Activate 
+(Windows) .venv\Scripts\activate
+
+if error run: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+
