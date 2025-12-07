@@ -20,9 +20,8 @@ https://docs.python.org/3/library/os.html
 https://learn.microsoft.com/en-us/windows/win32/ipc/pipes
 https://mhammond.github.io/pywin32/win32pipe.html
 https://wiki.gnuradio.org/index.php?title=GNU_Radio_Flowgraph_Embedded_in_Python_Applications
-
-
-images and pdfs:
-https://www.connecticutboatingcertificates.com/wp-content/uploads/2019/04/Chart-12354.pdf
+https://stackoverflow.com/questions/10133856/how-to-add-an-image-in-tkinter
+https://www.activestate.com/resources/quick-reads/how-to-add-images-in-tkinter/
+https://www.geeksforgeeks.org/python/python-tkinter-create-different-shapes-using-canvas-class/
 
 

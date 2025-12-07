@@ -7,20 +7,86 @@ import threading
 from tkinter import Toplevel 
 from tkinter import*
 import matplotlib.pyplot as plt
-from freq import freq
+from PIL import Image, ImageTk
+#from freq import freq
 #from tkPDFViewer import tkPDFViewer as pdf  
-#from ais import aistab
-#from vhf import vhftab
-#from uhf import uhftab
-#from dsc import dsctab
-#from playback import playbacktab
-#from settings import settingstab
-#from notes import notestab
+from ais import aistab
+from vhf import vhftab
+from dsc import dsctab
+from all import alltab
+from playback import playbacktab
+from settings import settingstab
 
+
+
+background_color = "#FFFFFF" 
+button_bg = "#006699"        
+button_fg = "#E03C31"  
 
 root = tk.Tk() # creates main window
-root.title("Coast Guard Sensor Network Audio") #sets title
+root.title("Coast Guard Sensor Network Audio Home") #sets title
 root.geometry("2900x1900") #sets window size
+root.configure(bg=background_color)
+button_frame = tk.Frame(root)
+button_frame.pack(pady=20)
+
+canvas = Canvas()
+canvas.create_rectangle(00,600,600,00, fill ="#006699",width = 6)
+
+#canvas.create_rectangle(210,10,10,210,outline ="#E03C31",fill ="#E03C31",width =4)
+
+canvas.pack()
+
+canvas.create_text(
+    185, 50,             
+    text="WELCOME",
+    fill="#E03C31",
+    font=("Courier", 40, "bold")
+)
+canvas.create_text(
+    185, 140,   
+    text="COAST GUARD AUDIO",
+    fill="#E03C31",
+    font=("Courier", 20, "bold")
+)
+canvas.create_text(
+    185, 180,   
+    text="TRANSMISSION HOMEPAGE",
+    fill="#E03C31",
+    font=("Courier", 20, "bold")
+)
+
+
+
+image_path1 = "cyber_logo.jpg"
+
+try:
+    original_image1 = Image.open(image_path1)
+    resized1 = original_image1.resize((150, 150))
+    logo_img1 = ImageTk.PhotoImage(resized1)
+
+    logo_label1 = tk.Label(root, image=logo_img1, bg=background_color)
+    logo_label1.image = logo_img1
+    logo_label1.pack(pady=10)
+    logo_label1.place(x=0, y=10)
+
+except:
+    print("Error")
+
+image_path2 = "ee_logo.jpg"
+
+try:
+    original_image2 = Image.open(image_path2)
+    resized2 = original_image2.resize((150, 150))
+    logo_img2 = ImageTk.PhotoImage(resized2)
+
+    logo_label2 = tk.Label(root, image=logo_img2, bg=background_color)
+    logo_label2.image = logo_img2
+    logo_label2.pack(pady=10)
+    logo_label2.place(x=1115, y=10)
+
+except:
+    print("Error")
 
 path = r"\\.\pipe\gnuradio_ctrl" #path that communicates between python and gnu radio will have to change if trying to run in linux to something like "/tmp/gnuradio_ctr"
 
@@ -36,51 +102,101 @@ def send_command(cmd: str): #defines function that sends commands to GNU radio t
     except Exception as e:  # handle errors if something goes wrong
         print(f"ERROR")
 
+        style = ttk.Style() # style configuration
+        style.theme_use("default")
+        style = ttk.Style() # style configuration
+
+
+def open_new_AIS():  
+    aistab(root)
+def open_new_vhf():
+    vhftab(root)
+def open_new_all():
+    alltab(root)
+def open_new_DSC():
+    dsctab(root)
+def open_new_Playback():
+    playbacktab(root)
+def open_new_Settings():
+    settingstab(root)
+
+
+buttons = [
+    ("AIS", open_new_AIS),
+    ("VHF", open_new_vhf),
+    ("DSC", open_new_DSC),
+    ("All", open_new_all),
+    ("Playback", open_new_Playback),
+    ("Settings", open_new_Settings)
+]
+for i, (text, command) in enumerate(buttons):
+    row = i % 3
+    col = i // 3
+    btn = tk.Button(
+        button_frame,
+        text=text,
+        command=command,
+        font=("Arial", 20),
+        fg="#FFFFFF",
+        bg="#006699",
+        width=10,
+        height=1
+    )
+    btn.grid(row=row, column=col, padx=20, pady=10)
+
+
+
+       
+
 def main(): 
-
-    tk.Label(root, text="Frequency (Hz):").pack(pady=5) #creates widget for user to enter frequency
-    freq_var = tk.StringVar(value="87.9e6")  #creates variable to store frequency as string and sets intial value 87.9e6
-    freq_entry = ttk.Entry(root, textvariable=freq_var, width=20) # Creates entry box 
-    freq_entry.pack(pady=5) 
-
-    def set_frequency(): #defines function 
-        val = freq_var.get() #reads the frequency from entry box
-        send_command(f"freq={val}") #sends frequecny as a command by a pipe
-
-    ttk.Button(root, text="Set Frequency", command=set_frequency).pack(pady=10) #create set frequency button
-
-    tk.Label(root, text="Sample Rate:").pack(pady=5) #creates sample rate widget
-    samp_var = tk.StringVar(value="2e6") #set inital sample rate
-    samp_entry = ttk.Entry(root, textvariable=samp_var, width=20) #creates entry box
-    samp_entry.pack(pady=5)
-
-    def set_samp_rate(): #defines function
-        val = samp_var.get() #reads sample rate
-        send_command(f"samp_rate={val}") #sends sample rate as a command
-
-    ttk.Button(root, text="set Sample Rate", command=set_samp_rate).pack(pady=10) #makes set sample rate button
-
-
-#create the graph that can plot radio freq graph
-    def plot_graph():#creates ploting function
-        x = [161, 161.5, 162, 162.5, 163, 163.5, 164, 164.5] #defines x axis values
-        y = [0, -20, -40, -60, -80, -100, -120, -140] #defines y axis values
-
-        plt.figure(figsize=(9, 6))   #creates the figure where display will be
-        plt.plot(x, y, marker= 'o', color= 'blue')    #creates plot
-        plt.xlabel('Frequency (MHz)') #labels x, y and main graph
-        plt.ylabel('Relative Gain')
-        plt.title('Radio Frequency Graph')  
-        plt.grid(True)  #includes grid
-        plt.tight_layout() #helps auto adjust the view
-        plt.show() #displays graph 
-
-    ttk.Button(root, text="Show Graph", command=plot_graph).pack(pady=20) #creates show graph button that one pressed displays graph
-
-    root.mainloop()
+   root.mainloop()
 
 if __name__ == "__main__":
     main()
+
+
+
+# Old extra code below: 
+
+    #tk.Label(root, text="Frequency (Hz):").pack(pady=5) #creates widget for user to enter frequency
+   # freq_var = tk.StringVar(value="87.9e6")  #creates variable to store frequency as string and sets intial value 87.9e6
+    #freq_entry = ttk.Entry(root, textvariable=freq_var, width=20) # Creates entry box 
+    #freq_entry.pack(pady=5) 
+
+   # def set_frequency(): #defines function 
+       # val = freq_var.get() #reads the frequency from entry box
+        #send_command(f"freq={val}") #sends frequecny as a command by a pipe
+
+   # ttk.Button(root, background = button_bg, foreground = button_fg, text="Set Frequency", command=set_frequency).pack(pady=10) #create set frequency button
+
+   # tk.Label(root, text="Sample Rate:").pack(pady=5) #creates sample rate widget
+  #  samp_var = tk.StringVar(value="2e6") #set inital sample rate
+   # samp_entry = ttk.Entry(root, textvariable=samp_var, width=20) #creates entry box
+   # samp_entry.pack(pady=5)
+
+    #def set_samp_rate(): #defines function
+       # val = samp_var.get() #reads sample rate
+        #send_command(f"samp_rate={val}") #sends sample rate as a command
+
+   # ttk.Button(root, background = button_bg, foreground = button_fg, text="Set Sample Rate", command=set_samp_rate).pack(pady=10) #makes set sample rate button
+
+
+#create the graph that can plot radio freq graph
+   # def plot_graph():#creates ploting function
+        #x = [161, 161.5, 162, 162.5, 163, 163.5, 164, 164.5] #defines x axis values
+        #y = [0, -20, -40, -60, -80, -100, -120, -140] #defines y axis values
+
+       # plt.figure(figsize=(9, 6))   #creates the figure where display will be
+        #plt.plot(x, y, marker= 'o', color= 'blue')    #creates plot
+        #plt.xlabel('Frequency (MHz)') #labels x, y and main graph
+        #plt.ylabel('Relative Gain')
+        #plt.title('Radio Frequency Graph')  
+        #plt.grid(True)  #includes grid
+        #plt.tight_layout() #helps auto adjust the view
+        #plt.show() #displays graph 
+
+   # ttk.Button(root, text="Show Graph", command=plot_graph).pack(pady=20) #creates show graph button that one pressed displays graph
+
 
 #def open_new_AIS():  
  #   aistab(root)

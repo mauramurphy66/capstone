@@ -6,3 +6,4 @@ Activate:
 if error run: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 
+conda activate capstoneenv

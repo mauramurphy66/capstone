@@ -63,7 +63,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [848, 36.0]
+    coordinate: [968, 52.0]
     rotation: 0
     state: enabled
 - name: samp_rate
@@ -411,7 +411,7 @@ blocks:
     center_freq7: '0'
     center_freq8: '0'
     center_freq9: '0'
-    clock_rate: 125.0e6
+    clock_rate: 30.72e6
     clock_source0: ''
     clock_source1: ''
     clock_source2: ''
@@ -744,6 +744,20 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [144, 168.0]
+    rotation: 0
+    state: enabled
+- name: xmlrpc_server_0
+  id: xmlrpc_server
+  parameters:
+    addr: localhost
+    alias: ''
+    comment: ''
+    port: '8081'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [760, 16.0]
     rotation: 0
     state: enabled
 

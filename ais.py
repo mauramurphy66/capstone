@@ -1,7 +1,7 @@
 import tkinter as tk
 #from tkPDFViewer import tkPDFViewer as pdf
 #from tkinter import Scrollbar, RIGHT, Y 
-import fitz
+
 from tkinter import *
 from PIL import Image, ImageTk
 
@@ -19,8 +19,7 @@ class aistab(tk.Toplevel):
        # v2 = v1.pdf_view(self, pdf_location=r"C:\Users\Maura\Downloads\capstone\chart.pdf", width=700, height=600)
        # v2.pack(expand=True, fill='both')
 
-        file_name = "chart.pdf"
-        doc = fitz.open(file_name)
+
 
         #scrollbar = Scrollbar(self)
         #scrollbar.pack(side=RIGHT, fill=Y)
