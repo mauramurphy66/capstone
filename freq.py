@@ -67,7 +67,7 @@ class freq(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 2*10**6
+        self.samp_rate = samp_rate = 256e3
         self.frequency_slider = frequency_slider = 87.9*10**6
         self.frequency = frequency = 87.9e6
 
@@ -95,8 +95,8 @@ class freq(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_antenna("RX2", 0)
         self.uhd_usrp_source_0.set_rx_agc(True, 0)
         self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
-                interpolation=12,
-                decimation=125,
+                interpolation=10,
+                decimation=100,
                 taps=[],
                 fractional_bw=0)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_c(
@@ -243,6 +243,10 @@ class freq(gr.top_block, Qt.QWidget):
         self.qtgui_freq_sink_x_0.set_frequency_range(self.frequency, self.samp_rate)
         self.uhd_usrp_source_0.set_center_freq(self.frequency, 0)
 
+    def embed_into(self, win_id):
+        self.setWindowFlag(Qt.Qt.FramelessWindowHint)
+        parent_widget = sip.wrapinstance(int(win_id), Qt.QWidget)
+        self.winContainer.setParent(parent_widget)
 
 
 
@@ -255,7 +259,7 @@ def main(top_block_cls=freq, options=None):
     tb.start()
     tb.flowgraph_started.set()
 
-    tb.show()
+    pass
 
     def sig_handler(sig=None, frame=None):
         tb.stop()
@@ -271,6 +275,7 @@ def main(top_block_cls=freq, options=None):
     timer.timeout.connect(lambda: None)
 
     qapp.exec_()
+
 
 if __name__ == '__main__':
     main()

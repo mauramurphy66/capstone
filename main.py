@@ -1,3 +1,4 @@
+
 import tkinter as tk
 import os
 import time
@@ -13,9 +14,14 @@ from PIL import Image, ImageTk
 from ais import aistab
 from vhf import vhftab
 from dsc import dsctab
-from all import alltab
+from channel13 import channel13
+#from channel16 import channel16
 from playback import playbacktab
+from NOAA import NOAAtab
 from settings import settingstab
+from channel16 import Channel16Controller
+from all import MultiController
+
 
 
 
@@ -107,14 +113,49 @@ def send_command(cmd: str): #defines function that sends commands to GNU radio t
         style = ttk.Style() # style configuration
 
 
-def open_new_AIS():  
-    aistab(root)
+
+#def open_new_16():
+ #   def launch():
+  #      ch16 = channel16(root)
+#
+ #       try:
+  #          ch16.tb.set_frequency(156800000) #set frequency for channel 16
+   #    except:
+    #       print("Warning: Could not set frequency yet (flowgraph might not be initialized).")
+
+        # Start GNU Radio flowgraph
+     #   ch16.tb.start()
+
+        # Embed PyQt window inside Tkinter frame
+    #    ch16.embed_into(ch16.embed_frame.winfo_id())
+
+        # Keep the PyQt GUI responsive inside Tkinter
+    #    def qt_loop():
+       #     from PyQt5 import Qt
+       #     Qt.QApplication.processEvents()
+        #    ch16.top.after(20, qt_loop)
+
+     #   qt_loop()
+
+   # import threading
+   # threading.Thread(target=launch, daemon=True).start()
+
+def open_new_16():
+    ch16 = Channel16Controller()
+    ch16.run_flowgraph()
+def open_new_13():
+    channel13(root)
+def open_new_NOAA():
+    NOAAtab(root)
 def open_new_vhf():
     vhftab(root)
 def open_new_all():
-    alltab(root)
+    all = MultiController()
+    all.run_flowgraph()
 def open_new_DSC():
     dsctab(root)
+def open_new_AIS():  
+    aistab(root)
 def open_new_Playback():
     playbacktab(root)
 def open_new_Settings():
@@ -122,10 +163,14 @@ def open_new_Settings():
 
 
 buttons = [
-    ("AIS", open_new_AIS),
+   
+    ("Channel 16", open_new_16),
+    ("Channel 13", open_new_13),
+    ("NOAA", open_new_NOAA),
     ("VHF", open_new_vhf),
     ("DSC", open_new_DSC),
-    ("All", open_new_all),
+    ("All Audio", open_new_all),
+     ("AIS", open_new_AIS),
     ("Playback", open_new_Playback),
     ("Settings", open_new_Settings)
 ]

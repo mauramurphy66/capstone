@@ -38,7 +38,7 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
     def __init__(self):
         gr.top_block.__init__(self, "Final_MultiChannel", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Final_MultiChannel")
+        self.setWindowTitle("MultiChannel Audio")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
