@@ -2055,6 +2055,20 @@ blocks:
     coordinate: [1600, 488.0]
     rotation: 0
     state: enabled
+- name: xmlrpc_server_0
+  id: xmlrpc_server
+  parameters:
+    addr: localhost
+    alias: ''
+    comment: ''
+    port: '8081'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [704, 16.0]
+    rotation: 0
+    state: enabled
 
 connections:
 - [analog_quadrature_demod_cf_0, '0', blocks_moving_average_xx_0, '0']

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import Toplevel 
-from tkPDFViewer import tkPDFViewer as pdf  
+#from tkPDFViewer import tkPDFViewer as pdf  
 
 root = tk.Tk()
 root.title("Coast Guard Sensor Network Home") 

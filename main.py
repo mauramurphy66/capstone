@@ -9,19 +9,21 @@ from tkinter import Toplevel
 from tkinter import*
 import matplotlib.pyplot as plt
 from PIL import Image, ImageTk
-#from freq import freq
-#from tkPDFViewer import tkPDFViewer as pdf  
 from ais import aistab
 from vhf import vhftab
 from dsc import dsctab
-from channel13 import channel13
-#from channel16 import channel16
 from playback import playbacktab
-from NOAA import NOAAtab
 from settings import settingstab
-from channel16 import Channel16Controller
 from all import MultiController
-
+from NOAA import toggle_NOAA
+from channel16 import toggle_Channel16
+from channel13 import toggle_Channel13
+#from NOAA import NOAAtab
+#from channel16 import channel16
+#from freq import freq
+#from tkPDFViewer import tkPDFViewer as pdf  
+#from channel13 import channel13
+#from channel16 import Channel16Controller
 
 
 
@@ -39,26 +41,25 @@ button_frame.pack(pady=20)
 canvas = Canvas()
 canvas.create_rectangle(00,600,600,00, fill ="#006699",width = 6)
 
-#canvas.create_rectangle(210,10,10,210,outline ="#E03C31",fill ="#E03C31",width =4)
 
 canvas.pack()
 
 canvas.create_text(
     185, 50,             
     text="WELCOME",
-    fill="#E03C31",
+    fill="#FFFFFF",
     font=("Courier", 40, "bold")
 )
 canvas.create_text(
     185, 140,   
     text="COAST GUARD AUDIO",
-    fill="#E03C31",
+    fill="#FFFFFF",
     font=("Courier", 20, "bold")
 )
 canvas.create_text(
     185, 180,   
     text="TRANSMISSION HOMEPAGE",
-    fill="#E03C31",
+    fill="#FFFFFF",
     font=("Courier", 20, "bold")
 )
 
@@ -114,39 +115,12 @@ def send_command(cmd: str): #defines function that sends commands to GNU radio t
 
 
 
-#def open_new_16():
- #   def launch():
-  #      ch16 = channel16(root)
-#
- #       try:
-  #          ch16.tb.set_frequency(156800000) #set frequency for channel 16
-   #    except:
-    #       print("Warning: Could not set frequency yet (flowgraph might not be initialized).")
-
-        # Start GNU Radio flowgraph
-     #   ch16.tb.start()
-
-        # Embed PyQt window inside Tkinter frame
-    #    ch16.embed_into(ch16.embed_frame.winfo_id())
-
-        # Keep the PyQt GUI responsive inside Tkinter
-    #    def qt_loop():
-       #     from PyQt5 import Qt
-       #     Qt.QApplication.processEvents()
-        #    ch16.top.after(20, qt_loop)
-
-     #   qt_loop()
-
-   # import threading
-   # threading.Thread(target=launch, daemon=True).start()
-
 def open_new_16():
-    ch16 = Channel16Controller()
-    ch16.run_flowgraph()
+    state = toggle_Channel16()
 def open_new_13():
-    channel13(root)
+    state = toggle_Channel13()
 def open_new_NOAA():
-    NOAAtab(root)
+    state = toggle_NOAA()
 def open_new_vhf():
     vhftab(root)
 def open_new_all():
@@ -164,13 +138,13 @@ def open_new_Settings():
 
 buttons = [
    
+    ("Start Radio", open_new_all),
     ("Channel 16", open_new_16),
     ("Channel 13", open_new_13),
     ("NOAA", open_new_NOAA),
     ("VHF", open_new_vhf),
     ("DSC", open_new_DSC),
-    ("All Audio", open_new_all),
-     ("AIS", open_new_AIS),
+    ("AIS", open_new_AIS),
     ("Playback", open_new_Playback),
     ("Settings", open_new_Settings)
 ]
@@ -285,4 +259,30 @@ if __name__ == "__main__":
 #button.pack(pady=10)
 
 
+#def open_new_16():
+ #   def launch():
+  #      ch16 = channel16(root)
+#
+ #       try:
+  #          ch16.tb.set_frequency(156800000) #set frequency for channel 16
+   #    except:
+    #       print("Warning: Could not set frequency yet (flowgraph might not be initialized).")
 
+        # Start GNU Radio flowgraph
+     #   ch16.tb.start()
+
+        # Embed PyQt window inside Tkinter frame
+    #    ch16.embed_into(ch16.embed_frame.winfo_id())
+
+        # Keep the PyQt GUI responsive inside Tkinter
+    #    def qt_loop():
+       #     from PyQt5 import Qt
+       #     Qt.QApplication.processEvents()
+        #    ch16.top.after(20, qt_loop)
+
+     #   qt_loop()
+
+   # import threading
+   # threading.Thread(target=launch, daemon=True).start()
+
+#canvas.create_rectangle(210,10,10,210,outline ="#E03C31",fill ="#E03C31",width =4)

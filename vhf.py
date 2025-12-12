@@ -1,7 +1,7 @@
 import tkinter as tk
 from PyQt5.QtWidgets import QApplication
 import sip
-from freq import freq
+#from freq import freq
 
 
 class vhftab:
@@ -17,7 +17,7 @@ class vhftab:
         win_id = self.embed_frame.winfo_id()
 
         #Start GNU Radio flowgraph
-        self.tb = freq()    
+       # self.tb = freq()    
         self.tb.start()               
         self.tb.embed_into(win_id)     
         self.tb.show()         

@@ -28,8 +28,9 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import uhd
 import time
-import sip
+from xmlrpc.server import SimpleXMLRPCServer
 import threading
+import sip
 
 
 
@@ -38,7 +39,7 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
     def __init__(self):
         gr.top_block.__init__(self, "Final_MultiChannel", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("MultiChannel Audio")
+        self.setWindowTitle("Final_MultiChannel")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -75,8 +76,11 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
         self.channel_rate = channel_rate = 48000
         self.baud_rate = baud_rate = 9600
         self.audio_decim = audio_decim = 4
+        self.NOAA_gain = NOAA_gain = 0
         self.NOAA = NOAA = 1
+        self.CH16_gain = CH16_gain = 0
         self.CH16 = CH16 = 0
+        self.CH13_gain = CH13_gain = 0
         self.CH13 = CH13 = 0
         self.AIS_samp_rate = AIS_samp_rate = 250000
 
@@ -84,15 +88,11 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
 
-        self._NOAA_range = qtgui.Range(0, 1, 1, 1, 200)
-        self._NOAA_win = qtgui.RangeWidget(self._NOAA_range, self.set_NOAA, "NOAA", "dial", float, QtCore.Qt.Horizontal)
-        self.top_layout.addWidget(self._NOAA_win)
-        self._CH16_range = qtgui.Range(0, 1, 1, 0, 200)
-        self._CH16_win = qtgui.RangeWidget(self._CH16_range, self.set_CH16, "CH16", "dial", float, QtCore.Qt.Horizontal)
-        self.top_layout.addWidget(self._CH16_win)
-        self._CH13_range = qtgui.Range(0, 1, 1, 0, 200)
-        self._CH13_win = qtgui.RangeWidget(self._CH13_range, self.set_CH13, "CH13", "dial", float, QtCore.Qt.Horizontal)
-        self.top_layout.addWidget(self._CH13_win)
+        self.xmlrpc_server_0 = SimpleXMLRPCServer(('localhost', 8081), allow_none=True)
+        self.xmlrpc_server_0.register_instance(self)
+        self.xmlrpc_server_0_thread = threading.Thread(target=self.xmlrpc_server_0.serve_forever)
+        self.xmlrpc_server_0_thread.daemon = True
+        self.xmlrpc_server_0_thread.start()
         self.uhd_usrp_source_0 = uhd.usrp_source(
             ",".join(("", '')),
             uhd.stream_args(
@@ -371,9 +371,9 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
         self.digital_diff_decoder_bb_0 = digital.diff_decoder_bb(2, digital.DIFF_DIFFERENTIAL)
         self.digital_binary_slicer_fb_0_0 = digital.binary_slicer_fb()
         self.digital_binary_slicer_fb_0 = digital.binary_slicer_fb()
-        self.blocks_multiply_const_vxx_1_1_0 = blocks.multiply_const_ff(CH13)
-        self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff(CH16)
-        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_ff(NOAA)
+        self.blocks_multiply_const_vxx_1_1_0 = blocks.multiply_const_ff(CH13_gain)
+        self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff(CH16_gain)
+        self.blocks_multiply_const_vxx_0 = blocks.multiply_const_ff(NOAA_gain)
         self.blocks_moving_average_xx_0_0 = blocks.moving_average_ff(5, (1/5), 4000, 1)
         self.blocks_moving_average_xx_0 = blocks.moving_average_ff(5, (1/5), 4000, 1)
         self.blocks_freqshift_cc_6 = blocks.rotator_cc(2.0*math.pi*8.35e6/samp_rate)
@@ -401,6 +401,15 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
         )
         self.analog_quadrature_demod_cf_0_0 = analog.quadrature_demod_cf((channel_rate/(2*math.pi*fsk_deviation)))
         self.analog_quadrature_demod_cf_0 = analog.quadrature_demod_cf((channel_rate/(2*math.pi*fsk_deviation)))
+        self._NOAA_range = qtgui.Range(0, 1, 1, 1, 200)
+        self._NOAA_win = qtgui.RangeWidget(self._NOAA_range, self.set_NOAA, "NOAA", "dial", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._NOAA_win)
+        self._CH16_range = qtgui.Range(0, 1, 1, 0, 200)
+        self._CH16_win = qtgui.RangeWidget(self._CH16_range, self.set_CH16, "CH16", "dial", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._CH16_win)
+        self._CH13_range = qtgui.Range(0, 1, 1, 0, 200)
+        self._CH13_win = qtgui.RangeWidget(self._CH13_range, self.set_CH13, "CH13", "dial", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._CH13_win)
 
 
         ##################################################
@@ -464,17 +473,19 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_freqshift_cc_0.set_phase_inc(2.0*math.pi*2400000/self.samp_rate)
-        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0*math.pi*8200000/self.samp_rate)
-        self.blocks_freqshift_cc_3.set_phase_inc(2.0*math.pi*2.525e6/self.samp_rate)
-        self.blocks_freqshift_cc_4.set_phase_inc(2.0*math.pi*2.475e6/self.samp_rate)
-        self.blocks_freqshift_cc_5.set_phase_inc(2.0*math.pi*8.475e6/self.samp_rate)
-        self.blocks_freqshift_cc_6.set_phase_inc(2.0*math.pi*8.35e6/self.samp_rate)
-        self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
-        self.qtgui_freq_sink_x_0_1.set_frequency_range(0, self.samp_rate)
-        self.qtgui_freq_sink_x_1.set_frequency_range(0, self.samp_rate)
-        self.qtgui_sink_x_0.set_frequency_range(0, self.samp_rate)
+
         self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
+
+        self.blocks_freqshift_cc_0.set_phase_inc(2.0 * math.pi * 2400000 / self.samp_rate)
+        self.blocks_freqshift_cc_0_0.set_phase_inc(2.0 * math.pi * 8200000 / self.samp_rate)
+        self.blocks_freqshift_cc_3.set_phase_inc(2.0 * math.pi * 2.525e6 / self.samp_rate)
+        self.blocks_freqshift_cc_4.set_phase_inc(2.0 * math.pi * 2.475e6 / self.samp_rate)
+        self.blocks_freqshift_cc_5.set_phase_inc(2.0 * math.pi * 8.475e6 / self.samp_rate)
+        self.blocks_freqshift_cc_6.set_phase_inc(2.0 * math.pi * 8.35e6 / self.samp_rate)
+        self.qtgui_sink_x_0.set_frequency_range(0, self.samp_rate)
+        self.qtgui_freq_sink_x_1.set_frequency_range(0, self.samp_rate)
+        self.qtgui_freq_sink_x_0_1.set_frequency_range(0, self.samp_rate)
+        self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
 
     def get_fsk_deviation(self):
         return self.fsk_deviation
@@ -510,26 +521,44 @@ class Final_MultiChannel(gr.top_block, Qt.QWidget):
     def set_audio_decim(self, audio_decim):
         self.audio_decim = audio_decim
 
+    def get_NOAA_gain(self):
+        return self.NOAA_gain
+
+    def set_NOAA_gain(self, NOAA_gain):
+        self.NOAA_gain = NOAA_gain
+        self.blocks_multiply_const_vxx_0.set_k(self.NOAA_gain)
+
     def get_NOAA(self):
         return self.NOAA
 
     def set_NOAA(self, NOAA):
         self.NOAA = NOAA
-        self.blocks_multiply_const_vxx_0.set_k(self.NOAA)
+
+    def get_CH16_gain(self):
+        return self.CH16_gain
+
+    def set_CH16_gain(self, CH16_gain):
+        self.CH16_gain = CH16_gain
+        self.blocks_multiply_const_vxx_1.set_k(self.CH16_gain)
 
     def get_CH16(self):
         return self.CH16
 
     def set_CH16(self, CH16):
         self.CH16 = CH16
-        self.blocks_multiply_const_vxx_1.set_k(self.CH16)
+
+    def get_CH13_gain(self):
+        return self.CH13_gain
+
+    def set_CH13_gain(self, CH13_gain):
+        self.CH13_gain = CH13_gain
+        self.blocks_multiply_const_vxx_1_1_0.set_k(self.CH13_gain)
 
     def get_CH13(self):
         return self.CH13
 
     def set_CH13(self, CH13):
         self.CH13 = CH13
-        self.blocks_multiply_const_vxx_1_1_0.set_k(self.CH13)
 
     def get_AIS_samp_rate(self):
         return self.AIS_samp_rate

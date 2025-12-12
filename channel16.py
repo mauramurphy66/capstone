@@ -1,34 +1,48 @@
-import subprocess
-import sys
-import os
+from xmlrpc.client import ServerProxy
+s = ServerProxy('http://localhost:8081')
 
-class Channel16Controller:
-    """
-    Launches the Channel 16 GNU Radio flowgraph in a separate process.
-    """
+def toggle_Channel16():
+    try:
+        current = s.get_CH16_gain()
 
-    def __init__(self):
-        # The exported flowgraph file from GRC
-        self.flowgraph_filename = "freq.py"
+        new_val = 0 if current == 1 else 1
 
-        # Absolute path to the flowgraph file
-        self.flowgraph_path = os.path.join(
-            os.path.dirname(__file__),
-            self.flowgraph_filename
-        )
+        s.set_CH16_gain(new_val)
 
-        # Check file exists
-        if not os.path.exists(self.flowgraph_path):
-            raise FileNotFoundError(
-                f"Channel 16 flowgraph not found at:\n{self.flowgraph_path}"
-            )
+        return "unmuted" if new_val == 1 else "muted"
 
-    def run_flowgraph(self):
-        """
-        Launch the flowgraph in a separate process so Tkinter GUI is not blocked.
-        """
-        python_exec = sys.executable  # Use the current Conda environment
-        subprocess.Popen([python_exec, self.flowgraph_path])
+    except Exception:
+        print("ERROR")
+
+#import subprocess
+#import sys
+#import os
+
+#class Channel16Controller:
+ #   """
+  #  Launches the Channel 16 GNU Radio flowgraph in a separate process.
+   # """
+
+    #def __init__(self):
+#   self.flowgraph_filename = "freq.py"
+#
+ #       self.flowgraph_path = os.path.join(
+  #          os.path.dirname(__file__),
+   #         self.flowgraph_filename
+    #    )
+#
+ #      
+  #      if not os.path.exists(self.flowgraph_path):
+   #         raise FileNotFoundError(
+    #            f"Channel 16 flowgraph not found at:\n{self.flowgraph_path}"
+     #       )
+
+    #def run_flowgraph(self):
+     #   """
+      #  Launch the flowgraph in a separate process so Tkinter GUI is not blocked.
+       # """
+       # python_exec = sys.executable  # Use the current Conda environment
+        #subprocess.Popen([python_exec, self.flowgraph_path])
 
 
 
